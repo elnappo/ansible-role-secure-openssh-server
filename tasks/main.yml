@@ -1,0 +1,69 @@
+---
+# tasks file for secure-ssh
+- include: pre.yml
+
+- name: Make sshd config secure :)
+  lineinfile: dest={{ ssh_sshd_config_path }} regexp={{ item.regexp | default(omit) }} line="{{ item.line }}" state={{ item.state | default("present") }} validate="sshd -t -f %s"
+  with_items:
+    - { line: "Port {{ ssh_port }}" }
+    - { line: "Protocol 2" }
+    - { line: "Protocol 1", state: "absent"}
+    - { line: "RSAAuthentication yes", state: "absent"}
+    - { regexp: "^PermitRootLogin\ ", line: "PermitRootLogin {{ ssh_permit_root_login }}" }
+    - { regexp: "^PermitEmptyPasswords\ ", line: "PermitEmptyPasswords no" }
+    - { regexp: "^StrictModes\ ", line: "StrictModes yes" }
+    - { regexp: "^KexAlgorithms\ ", line: "KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256" }
+    - { regexp: "^Ciphers\ ", line: "Ciphers chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr" }
+    - { regexp: "^MACs\ ", line: "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com" }
+  notify:
+    - reload ssh
+
+- name: Disable password login
+  lineinfile: dest={{ ssh_sshd_config_path }} regexp={{ item.regexp | default(omit) }} line="{{ item.line }}" state={{ item.state | default("present") }} validate="sshd -t -f %s"
+  with_items:
+    - { regexp: "^PubkeyAuthentication\ ", line: "PubkeyAuthentication yes" }
+    - { regexp: "^PasswordAuthentication\ ", line: "PasswordAuthentication no" }
+    - { regexp: "^ChallengeResponseAuthentication\ ", line: "ChallengeResponseAuthentication no" }
+    - { regexp: "^MaxAuthTries\ ", line: "MaxAuthTries 1" }
+    - { regexp: "^LoginGraceTime\ ", line: "LoginGraceTime 30" }
+
+  when: ssh_disable_password_login
+
+- name: Create host keys
+  command: ssh-keygen {{ item.parm }} -f {{ ssh_sshd_config_dir }}{{ item.file }} creates={{ ssh_sshd_config_dir }}{{ item.file }}
+  with_items:
+    - { parm: "-t ed25519", file: "ssh_host_ed25519_key" }
+    - { parm: "-t rsa -b 4069", file: "ssh_host_rsa_key" }
+  notify:
+    - reload ssh
+
+- name: Add created host kesys in sshd_config
+  lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" validate="sshd -t -f %s"
+  with_items:
+    - ssh_host_ed25519_key
+    - ssh_host_rsa_key
+
+- name: Remove deprecated (DSA and ECDSA) SSH host keys in sshd_config
+  lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" state=absent validate="sshd -t -f %s"
+  with_items:
+    - ssh_host_dsa_key
+    - ssh_host_ecdsa_key
+  when: ssh_remove_deprecated_server_keys
+
+- name: Remove deprecated SSH host keys
+  file: path={{ ssh_sshd_config_dir }}{{ item }} state=absent
+  with_items:
+    - ssh_host_dsa_key
+    - ssh_host_dsa_key.pub
+    - ssh_host_ecdsa_key
+    - ssh_host_ecdsa_key.pub
+  when: ssh_remove_deprecated_server_keys
+  notify:
+    - reload ssh
+
+- name: Set sshd config file mode/owner/group
+  file: path={{ ssh_sshd_config_path }} owner=root group=root mode=0644
+
+- name: Allow SSH (Firewall)
+  ufw: rule=allow port={{ ssh_port }} proto=tcp
+  register: allow_ssh_ufw

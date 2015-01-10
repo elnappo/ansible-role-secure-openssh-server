@@ -1,0 +1,11 @@
+---
+- name: Make sure openssh is installed
+  apt: name=openssh-server state=latest
+
+- name: Test sshd config path
+  stat: path={{ ssh_sshd_config_path }}
+  register: ssh_config_st
+
+- name: Fail if ssh config path is invalid
+  fail: msg="sshd config file not found! Check your ssh_sshd_config_dir and ssh_sshd_config_path var"
+  when: ssh_config_st.stat.exists is not defined or not ssh_config_st.stat.exists

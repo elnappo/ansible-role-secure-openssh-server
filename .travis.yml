@@ -1,0 +1,28 @@
+---
+language: python
+python: "2.7"
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-apt python-pycurl curl ufw wget gcc
+  - sudo apt-get install -qq openssh-server
+  - sudo apt-get build-dep -qq openssh-server
+  - sudo useradd sshd
+  - wget http://ftp.halifax.rwth-aachen.de/openbsd/OpenSSH/portable/openssh-6.7p1.tar.gz
+  - tar -xvf openssh-6.7p1.tar.gz
+  - cd openssh-6.7p1
+  - ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-md5-passwords --with-privsep-path=/var/lib/sshd
+  - sudo make install
+install:
+  - pip install ansible
+  - ansible --version
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - echo localhost > inventory
+script:
+  - ansible-playbook -i inventory --syntax-check --list-tasks test.yml
+  - ansible-playbook -i inventory --connection=local --sudo -vvvv test.yml
+  - >
+    ansible-playbook -i inventory --connection=local --sudo test.yml
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
+  - sshd -T -f /etc/ssh/sshd_config
