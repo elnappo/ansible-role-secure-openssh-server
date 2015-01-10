@@ -2,8 +2,8 @@
 Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your sshd config file instead of replacing it. 
 
 * Disable SSH version 1
-* Disable RSAAuthentication (only avalible in version 1)
-* Dont allow empty passwords
+* Disable RSAAuthentication (only available in version 1)
+* Don't allow empty passwords
 * Allow root login only without password
 * Use StrictModes
 * Allow only KexAlgorithms, Ciphers and MACs which where recommended by [Secure Secure Shell](https://stribika.github.io/2015/01/04/secure-secure-shell.html)
