@@ -11,6 +11,7 @@ before_install:
   - cd openssh-6.7p1
   - ./configure --prefix=/usr --sysconfdir=/etc/ssh --with-md5-passwords --with-privsep-path=/var/lib/sshd
   - sudo make install
+  - cd ..
 install:
   - pip install ansible
   - ansible --version
