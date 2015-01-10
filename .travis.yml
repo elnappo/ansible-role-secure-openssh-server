@@ -6,7 +6,6 @@ before_install:
   - sudo apt-get install -qq python-apt python-pycurl curl ufw wget gcc
   - sudo apt-get install -qq openssh-server
   - sudo apt-get build-dep -qq openssh-server
-  - sudo useradd sshd
   - wget http://ftp.halifax.rwth-aachen.de/openbsd/OpenSSH/portable/openssh-6.7p1.tar.gz
   - tar -xvf openssh-6.7p1.tar.gz
   - cd openssh-6.7p1
