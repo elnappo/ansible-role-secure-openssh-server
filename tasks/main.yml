@@ -30,7 +30,7 @@
   when: ssh_disable_password_login
 
 - name: Create host keys
-  command: ssh-keygen {{ item.parm }} -f {{ ssh_sshd_config_dir }}{{ item.file }} creates={{ ssh_sshd_config_dir }}{{ item.file }}
+  command: ssh-keygen {{ item.parm }} -f {{ ssh_sshd_config_dir }}{{ item.file }} -N '' creates={{ ssh_sshd_config_dir }}{{ item.file }}
   with_items:
     - { parm: "-t ed25519", file: "ssh_host_ed25519_key" }
     - { parm: "-t rsa -b 4069", file: "ssh_host_rsa_key" }
