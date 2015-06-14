@@ -3,14 +3,16 @@ galaxy_info:
   author: elnappo <elnappoo@gmail.com>
   description: Sets a secure config for openssh server >= 6.5
   license: MIT
-  min_ansible_version: 1.8
+    min_ansible_version: 1.9
   platforms:
   - name: Ubuntu
     versions:
-    - all
+    - trusty
+    - vivid
   - name: Debian
     versions:
-    - all
+    - jessie
+    - stretch
   categories:
   - networking
   - system
