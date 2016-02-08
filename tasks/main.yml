@@ -5,10 +5,10 @@
 - name: Make sshd config more secure :)
   lineinfile: dest={{ ssh_sshd_config_path }} regexp={{ item.regexp | default(omit) }} line="{{ item.line }}" state={{ item.state | default("present") }} validate="sshd -t -f %s"
   with_items:
-    - { line: "Port {{ ssh_port }}" }
     - { line: "Protocol 2" }
     - { line: "Protocol 1", state: "absent"}
     - { line: "RSAAuthentication yes", state: "absent"}
+    - { regexp: "^Port\ ", line: "Port {{ ssh_port }}" }
     - { regexp: "^PermitRootLogin\ ", line: "PermitRootLogin {{ ssh_permit_root_login }}" }
     - { regexp: "^PermitEmptyPasswords\ ", line: "PermitEmptyPasswords no" }
     - { regexp: "^StrictModes\ ", line: "StrictModes yes" }
