@@ -2,7 +2,7 @@
 # tasks file for secure-ssh
 - include: pre.yml
 
-- name: Make sshd config secure :)
+- name: Make sshd config more secure :)
   lineinfile: dest={{ ssh_sshd_config_path }} regexp={{ item.regexp | default(omit) }} line="{{ item.line }}" state={{ item.state | default("present") }} validate="sshd -t -f %s"
   with_items:
     - { line: "Port {{ ssh_port }}" }
@@ -56,6 +56,8 @@
   with_items:
     - ssh_host_ed25519_key
     - ssh_host_rsa_key
+  notify:
+    - reload ssh
 
 - name: Remove deprecated (DSA and ECDSA) SSH host keys in sshd_config
   lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" state=absent validate="sshd -t -f %s"
@@ -63,6 +65,8 @@
     - ssh_host_dsa_key
     - ssh_host_ecdsa_key
   when: ssh_remove_deprecated_server_keys
+  notify:
+    - reload ssh
 
 - name: Remove deprecated SSH host keys
   file: path={{ ssh_sshd_config_dir }}{{ item }} state=absent

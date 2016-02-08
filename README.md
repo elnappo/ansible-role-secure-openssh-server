@@ -7,15 +7,12 @@ Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your ssh
 * Allow root login only without password
 * Use StrictModes
 * Allow only KexAlgorithms, Ciphers and MACs which where recommended by [Secure Secure Shell](https://stribika.github.io/2015/01/04/secure-secure-shell.html)
-* Removes DSA and ECDSA host keys by default. Change  `ssh_remove_deprecated_server_keys` if this is not what you want.
+* Removes DSA and ECDSA host keys by default. Change `ssh_remove_deprecated_server_keys` if this is not what you want
 * Regenerates RSA host key if shorter than 4096 bits (default)
 * Disable password login by default which also sets `MaxAuthTries 1` and `LoginGraceTime 30`
 
 #### Recommended `~/.ssh/config`, `/etc/ssh/ssh_config`
-```
-Host github.com
-    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1
-    
+``` 
 Host *
 	PasswordAuthentication no
 	PubkeyAuthentication yes
@@ -25,6 +22,8 @@ Host *
 	MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com
 ```
 
+alias for legacy connections: `alias ssh_ignore="ssh -F /dev/null"`
+
 ## Inspired by
 * [Secure Secure Shell](https://stribika.github.io/2015/01/04/secure-secure-shell.html)
 * [BetterCrypto](https://github.com/BetterCrypto/Applied-Crypto-Hardening)
@@ -32,7 +31,7 @@ Host *
 
 ## Requirements
 * Ubuntu or Debian
-* OpenSSH Server >= 6.5 (which is in Ubuntu >= 14.04 and Debian >=8)
+* OpenSSH Server >= 6.5 (which is in Ubuntu >= 14.04 and Debian >= 8)
 
 ## Role Variables
 * `ssh_sshd_config_dir: /etc/ssh/`

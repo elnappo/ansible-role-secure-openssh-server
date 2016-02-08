@@ -2,7 +2,7 @@
 # defaults file for secure-ssh
 ssh_sshd_config_dir: /etc/ssh/
 ssh_sshd_config_path: "{{ ssh_sshd_config_dir }}sshd_config"
-# sh_permit_root_login: yes / no / without-password / forced-commands-only
+# help for ssh_permit_root_login: yes / no / without-password / forced-commands-only
 ssh_permit_root_login: without-password
 ssh_disable_password_login: true
 ssh_remove_deprecated_server_keys: true
