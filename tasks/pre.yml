@@ -2,6 +2,14 @@
 - name: Make sure openssh is installed
   apt: name=openssh-server state=latest
 
+- name: Test availability of the sshd command
+  shell: command -v sshd >/dev/null 2>&1 || { echo "sshd executable is not available"; }
+  register: sshd_command_result
+
+- name: Fail if user does not have access to sshd
+  fail: msg="sshd executable is not available! did you try to become a super user?"
+  when: "'sshd executable is not available' in sshd_command_result.stdout"
+
 - name: Test sshd config path
   stat: path={{ ssh_sshd_config_path }}
   register: ssh_config_st
