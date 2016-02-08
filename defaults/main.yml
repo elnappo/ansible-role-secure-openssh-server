@@ -6,5 +6,6 @@ ssh_sshd_config_path: "{{ ssh_sshd_config_dir }}sshd_config"
 ssh_permit_root_login: without-password
 ssh_disable_password_login: true
 ssh_remove_deprecated_server_keys: true
+ssh_host_rsa_key_length: 4096
 ssh_setup_ufw: true
 ssh_port: 22

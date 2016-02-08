@@ -8,6 +8,7 @@ Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your ssh
 * Use StrictModes
 * Allow only KexAlgorithms, Ciphers and MACs which where recommended by [Secure Secure Shell](https://stribika.github.io/2015/01/04/secure-secure-shell.html)
 * Removes DSA and ECDSA host keys by default. Change  `ssh_remove_deprecated_server_keys` if this is not what you want.
+* Regenerates RSA host key if shorter than 4096 bits (default)
 * Disable password login by default which also sets `MaxAuthTries 1` and `LoginGraceTime 30`
 
 #### Recommended `~/.ssh/config`, `/etc/ssh/ssh_config`
@@ -38,7 +39,8 @@ Host *
 * `ssh_sshd_config_path: "{{ ssh_sshd_config_dir }}sshd_config"`
 * `ssh_permit_root_login: without-password`
 * `ssh_disable_password_login: true`
-* `ssh_remove_deprecated_server_keys: true` disables DSA and ECDSA
+* `ssh_remove_deprecated_server_keys: true` disables DSA, ECDSA and regenerate RSA key if <`ssh_host_rsa_key_length`
+* `ssh_host_rsa_key_length: 4096`
 * `ssh_setup_ufw: true`
 * `ssh_port: 22`
 

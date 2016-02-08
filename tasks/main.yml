@@ -29,11 +29,25 @@
 
   when: ssh_disable_password_login
 
+- name: Check host rsa key length
+  command: bash -c "ssh-keygen -l -f {{ ssh_sshd_config_dir }}ssh_host_rsa_key | cut -d ' ' -f 1"
+  register: current_host_rsa_key_length
+  changed_when: false
+
+- name: Remove host rsa key if to short
+  file: path={{ ssh_sshd_config_dir }}{{ item }} state=absent
+  with_items:
+    - ssh_host_rsa_key
+    - ssh_host_rsa_key.pub
+  when: current_host_rsa_key_length.stdout < "{{ssh_host_rsa_key_length}}" and ssh_remove_deprecated_server_keys
+  notify:
+    - reload ssh
+
 - name: Create host keys
   command: ssh-keygen {{ item.parm }} -f {{ ssh_sshd_config_dir }}{{ item.file }} -N '' creates={{ ssh_sshd_config_dir }}{{ item.file }}
   with_items:
     - { parm: "-t ed25519", file: "ssh_host_ed25519_key" }
-    - { parm: "-t rsa -b 4069", file: "ssh_host_rsa_key" }
+    - { parm: "-t rsa -b {{ssh_host_rsa_key_length}}", file: "ssh_host_rsa_key" }
   notify:
     - reload ssh
 
