@@ -8,13 +8,12 @@ galaxy_info:
   - name: Ubuntu
     versions:
     - trusty
-    - wily
-    - xenial
   - name: Debian
     versions:
     - jessie
-    - stretch
-  categories:
+  galaxy_tags:
   - networking
   - system
+  - ssh
+  - security
 dependencies: []

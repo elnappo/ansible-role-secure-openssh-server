@@ -47,13 +47,16 @@ alias for legacy connections: `alias ssh_ignore="ssh -F /dev/null"`
 None.
 
 ## Example Playbook
-    - hosts: server
-	  remote_user: root
-	  vars:
-	    - ssh_remove_deprecated_server_keys: false
-	    - ssh_port: 1813
-	  roles:
-	    - { role: elnappoo.secure-openssh-server }
+
+```yaml
+- hosts: server
+  remote_user: root
+  vars:
+    - ssh_remove_deprecated_server_keys: false
+    - ssh_port: 1813
+  roles:
+    - { role: elnappoo.secure-openssh-server }
+```
 
 ## License
 MIT
