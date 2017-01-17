@@ -36,7 +36,7 @@ alias for legacy connections: `alias ssh_ignore="ssh -F /dev/null"`
 ## Role Variables
 * `ssh_sshd_config_dir: /etc/ssh/`
 * `ssh_sshd_config_path: "{{ ssh_sshd_config_dir }}sshd_config"`
-* `ssh_permit_root_login: without-password`
+* `ssh_permit_root_login: "without-password"` quotes are mandatory!
 * `ssh_disable_password_login: true`
 * `ssh_remove_deprecated_server_keys: true` disables DSA, ECDSA and regenerate RSA key if <`ssh_host_rsa_key_length`
 * `ssh_host_rsa_key_length: 4096`
