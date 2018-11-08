@@ -1,5 +1,5 @@
 # ansible-role-secure-openssh-server [![Build Status](https://travis-ci.org/elnappo/ansible-role-secure-openssh-server.svg?branch=master)](https://travis-ci.org/elnappo/ansible-role-secure-openssh-server)
-Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your sshd config file instead of replacing it. 
+Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your sshd config file instead of replacing it.
 
 * Disable SSH version 1
 * Disable RSAAuthentication (only available in version 1)
@@ -12,7 +12,7 @@ Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your ssh
 * Disable password login by default which also sets `MaxAuthTries 1` and `LoginGraceTime 30`
 
 #### Recommended `~/.ssh/config`, `/etc/ssh/ssh_config`
-``` 
+```
 Host *
     HashKnownHosts yes
 	PasswordAuthentication no
@@ -58,7 +58,7 @@ None.
     - ssh_remove_deprecated_server_keys: false
     - ssh_port: 1813
   roles:
-    - { role: elnappoo.secure-openssh-server }
+    - { role: elnappo.secure-openssh-server }
 ```
 
 ## License
