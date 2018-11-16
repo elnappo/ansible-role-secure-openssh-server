@@ -52,7 +52,7 @@
     - reload ssh
 
 - name: Add created host keys to sshd_config
-  lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" insertafter="^HostKey\ " validate="sshd -t -f %s"
+  lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" validate="sshd -t -f %s"
   with_items:
     - ssh_host_ed25519_key
     - ssh_host_rsa_key
