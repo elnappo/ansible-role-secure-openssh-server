@@ -1,4 +1,6 @@
-# ansible-role-secure-openssh-server [![Build Status](https://travis-ci.org/elnappo/ansible-role-secure-openssh-server.svg?branch=master)](https://travis-ci.org/elnappo/ansible-role-secure-openssh-server)
+# ansible-role-secure-openssh-server
+[![Build Status](https://travis-ci.org/elnappo/ansible-role-secure-openssh-server.svg?branch=master)](https://travis-ci.org/elnappo/ansible-role-secure-openssh-server) [![Ansible Galaxy](https://img.shields.io/badge/galaxy-elnappo.secure--openssh--server-blue.svg?style=flat)](https://galaxy.ansible.com/elnappo/secure-openssh-server/)
+
 Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your sshd config file instead of replacing it.
 
 * Disable SSH version 1
@@ -10,7 +12,7 @@ Set up a secure config for OpenSSH Server >= 6.5. This playbook extends your ssh
 * Removes DSA and ECDSA host keys by default. Change `ssh_remove_deprecated_server_keys` if this is not what you want
 * Regenerates RSA host key if shorter than 4096 bits (default)
 * Disable password login by default which also sets `MaxAuthTries 1` and `LoginGraceTime 30`
-
+shields.io
 #### Recommended `~/.ssh/config`, `/etc/ssh/ssh_config`
 ```
 Host *
