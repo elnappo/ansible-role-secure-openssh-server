@@ -3,7 +3,12 @@
 - include: pre.yml
 
 - name: Make sshd config more secure :)
-  lineinfile: dest={{ ssh_sshd_config_path }} regexp={{ item.regexp | default(omit) }} line="{{ item.line }}" state={{ item.state | default("present") }} validate="sshd -t -f %s"
+  lineinfile:
+    dest: "{{ ssh_sshd_config_path }}"
+    regexp: "{{ item.regexp | default(omit) }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state | default('present') }}"
+    validate: "sshd -t -f %s"
   with_items:
     - { line: "Protocol 2" }
     - { line: "Protocol 1", state: "absent"}
@@ -19,15 +24,21 @@
     - reload ssh
 
 - name: Disable password login
-  lineinfile: dest={{ ssh_sshd_config_path }} regexp={{ item.regexp | default(omit) }} line="{{ item.line }}" state={{ item.state | default("present") }} validate="sshd -t -f %s"
+  lineinfile:
+    dest: "{{ ssh_sshd_config_path }}"
+    regexp: "{{ item.regexp | default(omit) }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state | default('present') }}"
+    validate: "sshd -t -f %s"
   with_items:
     - { regexp: "^PubkeyAuthentication\ ", line: "PubkeyAuthentication yes" }
     - { regexp: "^PasswordAuthentication\ ", line: "PasswordAuthentication no" }
     - { regexp: "^ChallengeResponseAuthentication\ ", line: "ChallengeResponseAuthentication no" }
     - { regexp: "^MaxAuthTries\ ", line: "MaxAuthTries 1" }
     - { regexp: "^LoginGraceTime\ ", line: "LoginGraceTime 30" }
-
   when: ssh_disable_password_login
+  notify:
+    - reload ssh
 
 - name: Check host rsa key length
   command: bash -c "ssh-keygen -l -f {{ ssh_sshd_config_dir }}ssh_host_rsa_key | cut -d ' ' -f 1"
@@ -35,11 +46,13 @@
   changed_when: false
 
 - name: Remove host rsa key if to short
-  file: path={{ ssh_sshd_config_dir }}{{ item }} state=absent
+  file:
+    path: "{{ ssh_sshd_config_dir }}{{ item }}"
+    state: absent
   with_items:
     - ssh_host_rsa_key
     - ssh_host_rsa_key.pub
-  when: current_host_rsa_key_length.stdout < "{{ssh_host_rsa_key_length}}" and ssh_remove_deprecated_server_keys
+  when: current_host_rsa_key_length.stdout < "{{ ssh_host_rsa_key_length }}" and ssh_remove_deprecated_server_keys
   notify:
     - reload ssh
 
@@ -47,12 +60,15 @@
   command: ssh-keygen {{ item.parm }} -f {{ ssh_sshd_config_dir }}{{ item.file }} -N '' creates={{ ssh_sshd_config_dir }}{{ item.file }}
   with_items:
     - { parm: "-t ed25519", file: "ssh_host_ed25519_key" }
-    - { parm: "-t rsa -b {{ssh_host_rsa_key_length}}", file: "ssh_host_rsa_key" }
+    - { parm: "-t rsa -b {{ ssh_host_rsa_key_length }}", file: "ssh_host_rsa_key" }
   notify:
     - reload ssh
 
 - name: Add created host keys to sshd_config
-  lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" validate="sshd -t -f %s"
+  lineinfile:
+    dest: "{{ ssh_sshd_config_path }}"
+    line: "HostKey {{ ssh_sshd_config_dir }}{{ item }}"
+    validate: "sshd -t -f %s"
   with_items:
     - ssh_host_ed25519_key
     - ssh_host_rsa_key
@@ -60,7 +76,11 @@
     - reload ssh
 
 - name: Remove deprecated (DSA and ECDSA) SSH host keys in sshd_config
-  lineinfile: dest={{ ssh_sshd_config_path }} line="HostKey {{ ssh_sshd_config_dir }}{{ item }}" state=absent validate="sshd -t -f %s"
+  lineinfile:
+    dest: "{{ ssh_sshd_config_path }}"
+    line: "HostKey {{ ssh_sshd_config_dir }}{{ item }}"
+    state: absent
+    validate: "sshd -t -f %s"
   with_items:
     - ssh_host_dsa_key
     - ssh_host_ecdsa_key
@@ -69,7 +89,9 @@
     - reload ssh
 
 - name: Remove deprecated SSH host keys
-  file: path={{ ssh_sshd_config_dir }}{{ item }} state=absent
+  file:
+    path: "{{ ssh_sshd_config_dir }}{{ item }}"
+    state: absent
   with_items:
     - ssh_host_dsa_key
     - ssh_host_dsa_key.pub
@@ -80,9 +102,16 @@
     - reload ssh
 
 - name: Set sshd config file mode/owner/group
-  file: path={{ ssh_sshd_config_path }} owner=root group=root mode=0644
+  file:
+    path: "{{ ssh_sshd_config_path }}"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Allow SSH (Firewall)
-  ufw: rule=allow port={{ ssh_port }} proto=tcp
+  ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
   when: ssh_setup_ufw
   register: allow_ssh_ufw

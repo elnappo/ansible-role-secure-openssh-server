@@ -1,7 +1,11 @@
 ---
 # handlers file for secure-ssh
 - name: restart ssh
-  service: name=ssh state=restarted
+  service:
+    name: ssh
+    state: restarted
 
 - name: reload ssh
-  service: name=ssh state=reloaded
+  service:
+    name: ssh
+    state: reloaded
