@@ -4,7 +4,7 @@
     name: openssh-server
     state: latest
   tags:
-  - skip_ansible_lint
+    - skip_ansible_lint
 
 - name: Test sshd config path
   stat:

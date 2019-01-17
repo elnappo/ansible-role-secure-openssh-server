@@ -1,29 +1,20 @@
 ---
-sudo: required
-dist: xenial
 language: python
-python: "2.7"
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python-apt python-pycurl curl ufw
+services: docker
+
+env:
+  matrix:
+    - MOLECULE_DISTRO: ubuntu1404
+    - MOLECULE_DISTRO: ubuntu1604
+    - MOLECULE_DISTRO: ubuntu1804
+    - MOLECULE_DISTRO: debian8
+    - MOLECULE_DISTRO: debian9
+
 install:
-  - pip install ansible --upgrade
-  - ansible --version
-  - printf '[defaults]\nroles_path=../' >ansible.cfg
-  - echo localhost > inventory
+  - pip install molecule docker
+
 script:
-  - ansible-playbook -i inventory --syntax-check --list-tasks test.yml
-  - ansible-playbook -i inventory --connection=local --become -vvvv test.yml
-  - ansible-playbook -i inventory --connection=local --become -vvvv test.yml
-  - >
-    ansible-playbook -i inventory --connection=local --become test.yml
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
-after_script:
-  - sshd --version || true
-  - sshd -T -f /etc/ssh/sshd_config
-  - cat /etc/ssh/sshd_config
-  - ls -la /etc/ssh/
+  - molecule test
+
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
